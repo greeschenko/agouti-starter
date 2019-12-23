@@ -1,0 +1,154 @@
+Login as owner
+    go to page http://localhost
+    click #loginbtn
+    see input#loginform-username
+    enter "testadmin@test.t" in #loginform-username
+    enter "testpass" in #loginform-password
+    click name=login-button
+    !see "Невірний логін або пароль"
+
+Create auction
+    go to page http://localhost/prozorrosale2/auctions/public
+    see #addauctionbtn
+    click #addauctionbtn
+    click #createrent
+    see #add-auction-form
+
+    enter faker.title #addauctionform-title
+    enter faker.string #addauctionform-lotidentifier
+    enter faker.amount #addauctionform-value_amount
+
+    select rand(0,1) #addauctionform-value_valueaddedtaxincluded
+
+    enter faker.amount #addauctionform-minimalstep_amount
+
+    select rand(0,1) #addauctionform-minimalstep_valueaddedtaxincluded
+
+    enter faker.amount #addauctionform-guarantee_amount
+    enter propgendata #addauctionform-auctionperiod_startdate
+
+    select rand(0,10) #addauctionform-tenderattempts
+
+    select rand(1,2) addauctionform-minnumberofqualifiedbids" class="form-control" name="AddAuctionForm[minNumberOfQualifiedBids]">
+
+    enter #addauctionform-description
+
+    files
+
+    addfile test.png #doc_upload_field_notice
+    addfile test.png #doc_upload_field_tenderNotice
+    addfile test.png #doc_upload_field_technicalSpecifications
+    addfile test.png #doc_upload_field_illustration
+    addfile test.png #doc_upload_field_evaluationCriteria
+    addfile test.png #doc_upload_field_contractProforma
+    addfile test.png #doc_upload_field_x_presentation
+    addfile test.png #doc_upload_field_
+
+    enter faker.text #addauctionform-accessdetails-0
+
+    enter rand(1,3) #addauctionform-leasedurationy
+
+    enter "06110000-6 - Земельні ділянки призначені для забудови" #additemform-0-classification_id
+    enter rand(1,10) #additemform-0-quantity
+
+    select "E27" #additemform-0-unit_code
+
+    enter faker.text #additemform-0-description
+
+    enter faker.string #additemform-0-address_postalcode
+    enter faker.string #additemform-0-address_countryname
+    enter faker.string #additemform-0-address_region
+    enter faker.string #additemform-0-address_locality
+    enter faker.string #additemform-0-address_streetaddress
+
+    click #save_auction_to_draft
+
+    see $auctionID
+    get $auctionID
+
+Update auction and publish
+    go to page http://localhost/prozorrosale/auctions/{$auctionID}
+    click #update_auction_btn
+    enter faker.string #addauctionform-lotidentifier
+    addfile test.png #doc_upload_field_clarifications
+    click #add-auction-form-save
+    see "Опубліковано з чернетки аукціон"
+
+Login as memb1
+    go to page http://localhost/prozorrosale/user/logout
+    click #loginbtn
+    see input#loginform-username
+    enter "testmemb1@test.t" in #loginform-username
+    enter "testpass" in #loginform-password
+    click name=login-button
+    !see "Невірний логін або пароль"
+
+Add bid by memb1
+    go to page http://localhost/prozorrosale/auctions/{$auctionID}
+    click #add_bid_btn
+    enter {auction amount + 1000} #addbidform-sum
+    click #addbidform-agriment
+    click #submit_add_bid_form
+    see {auction amount + 1000}
+
+Login as memb2
+    go to page http://localhost/prozorrosale/user/logout
+    click #loginbtn
+    see input#loginform-username
+    enter "testmemb2@test.t" in #loginform-username
+    enter "testpass" in #loginform-password
+    click name=login-button
+    !see "Невірний логін або пароль"
+
+Add bid by memb2
+    go to page http://localhost/prozorrosale/auctions/{$auctionID}
+    click #add_bid_btn
+    enter {auction amount + 2000} #addbidform-sum
+    click #addbidform-agriment
+    click #submit_add_bid_form
+    see {auction amount + 2000}
+
+Wait auction by member and add one bit
+    go to page http://localhost/prozorrosale/auctions/{$auctionID}
+    see #show_private_btn
+    click #show_private_btn
+    if see button[name="confirm"]
+        click button[name="confirm"]
+    wait see input[name="bid"]
+    enter 4000 input[name="bid"]
+    click #place-bid-button
+    see "Заявку прийнято"
+    wait see "Повернутися до Аукціону"
+
+Login by owner
+    go to page http://localhost/prozorrosale/user/logout
+    click #loginbtn
+    see input#loginform-username
+    enter "testadmin@test.t" in #loginform-username
+    enter "testpass" in #loginform-password
+    click name=login-button
+    !see "Невірний логін або пароль"
+
+Wait end auction and do cvalification
+    go to page http://localhost/prozorrosale/auctions/{$auctionID}
+    wait see "Очікується опублікування протоколу"
+    click #upload_owner_protocol_and_contract
+    addfile test.png #award_doc_upload_field_auctionProtocol
+    click #submit_owner_add_protocol
+    wait see "Очікується підписання договору"
+
+Do contracting
+    see #add_contract_docs
+    addfile test.png #contract_doc_upload_fieldcontractSigned
+    click #submit_add_contract_form
+    see "Збережено документи договору аукціону"
+    wait see "Документи успішно відправлено до ЦБД"
+    click #docuploadsuccess
+    click #signed_contract_btn
+    enter get_contract_sign_date #addsignform-datesigned
+    click #submit_sign_contract
+    see "Договір підписано успішно."
+    see "Аукціон завершено. Договір підписано."
+
+
+
